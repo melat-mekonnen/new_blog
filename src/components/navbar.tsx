@@ -1,23 +1,21 @@
-import Link from 'next/link'
-import Image from 'next/image'
-import { ModeToggle } from './mode-toggle'
-import { Button } from "@/components/ui/button"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import { Menu } from 'lucide-react'
+import Link from "next/link";
+import Image from "next/image";
+import { ModeToggle } from "./mode-toggle";
+import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Menu } from "lucide-react";
 
 const navItems = [
-  { name: 'Home', href: '/' },
-  { name: 'About', href: '/about' },
-  { name: 'Events', href: '/events' },
-  { name: 'Communities', href: '/communities' },
-  { name: 'News', href: '/news' },
-  { name: 'Games', href: '/games' },
-  
-
-]
+  { name: "Home", href: "/" },
+  { name: "About", href: "/about" },
+  { name: "Blog", href: "/blog" },
+  { name: "Events", href: "/events" },
+  { name: "Communities", href: "/communities" },
+  { name: "News", href: "/news" },
+  { name: "Games", href: "/games" },
+];
 
 export function Navbar() {
-
   return (
     <nav className="fixed top-0 w-full z-50 bg-background/80 backdrop-blur-sm border-b pl-5 pr-5">
       <div className="container flex items-center justify-between py-4">
@@ -78,5 +76,5 @@ export function Navbar() {
         </Sheet>
       </div>
     </nav>
-  )
+  );
 }
