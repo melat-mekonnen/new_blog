@@ -3,6 +3,7 @@ import { ThemeProvider } from "@/utils/theme-provider";
 import { Inter } from 'next/font/google'
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
+import { BlogProvider } from "@/contexts/BlogContext";
 import "./globals.css";
 
 const inter = Inter({
@@ -30,10 +31,12 @@ export default function RootLayout({
             defaultTheme="system"
             enableSystem
             disableTransitionOnChange
-          >
+        >
+          <BlogProvider>
             <Navbar/>
               {children}
             <Footer/>
+          </BlogProvider>
         </ThemeProvider>
       </body>
     </html>
