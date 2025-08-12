@@ -1,0 +1,136 @@
+Zemenay Tech Solutions Hackathon – Concept Note
+ Date: July 2025
+ Organizer: Zemenay Tech Solutions
+ Format: Fully Online
+ Duration: 1 Week (Planning & Execution)
+
+Overview
+Zemenay Tech Solutions is organizing an open hackathon aimed at solving a key bottleneck in our workflow building and integrating a blog system into our websites. It’s open to both interns and the public, fostering collaboration, learning, and innovation.
+
+Challenge 1 - Plug and Play Solution
+Our current blog setup is time-consuming because:
+It requires a backend
+
+
+It needs an admin panel
+
+
+We want a plug-and-play blog or products or ai chatbot system — installable via npm or similar, integrated easily, and production-ready in minutes.
+Your goal: Build a modular blog solution that can plug into any Next.js frontend.
+
+Technical Specs
+Frontend: Next.js
+
+
+Backend: Your choice
+
+
+Database: PostgreSQL via Supabase
+
+
+Provide a clear and complete README.md
+
+
+
+
+
+Integrate your app with our public website template
+
+Challenge 2 - Zemenay Website Redesign
+Overview
+This challenge focuses on the redesign and front-end implementation of the Zemenay public-facing website. Participants are expected to deliver a responsive, production-ready web interface that aligns with modern design standards and includes all required content and features.
+Deliverables
+Participants must submit either of the following. You can submit the Front End Implementation only, but including a Design with additional concepts will give you an edge
+Front-End Implementation A complete, responsive website built using. This is a mandatory deliverable. Next js is recommended, but not the best.
+UI Design (Highly recommended  ) A visual design prototype or mockup of the website. While optional, inclusion of a UI design will be considered favorably during evaluation, particularly if it demonstrates additional conceptual features.
+Both deliverables must be submitted by the end of the Hackathon.
+Required Pages
+The following pages must be included in the final implementation:
+Home
+About Us
+Pricing
+Product
+Additional pages can be included and will be highly recommended.
+Required Features
+The following features must be implemented:
+Contact Information Displayed at the bottom of the Footer.
+Client History A section highlighting past clients or case studies.
+Client Testimonials A section featuring recommendations or feedback from previous clients.
+Pricing and Products Table A structured table referencing the layout and content of the existing website.
+All features must be fully functional and integrated into the final implementation, but more features are allowed to be added. These are merely the bare minimum
+Technical Requirements
+Design The website must be responsive and optimized for mobile devices.
+
+
+
+
+Timeline
+Kickoff: Wednesday August 6
+
+
+Submission Deadline: Wednesday, August 13
+
+
+Marketing: We’ll promote the hackathon this week to attract external participants
+
+
+Support: Our team is available throughout the week for assistance
+
+
+
+Team Formation
+Work solo or in teams.
+ Post in the group chat if you’re seeking teammates, and let others reply to join you.
+
+Prizes
+🥇 First Place: 3,000 ETB
+
+
+🥈 Second Place: 2,000 ETB
+
+
+🥉 Third Place: 1,000 ETB
+
+But there can be a scenario there could be one winner only with 6,000
+
+Deliverables
+Public GitHub repo with working application
+
+
+Full README.md instructions for installation and usage
+
+
+Ownership transferred to Zemenay Tech Solutions
+
+
+Successful integration with the frontend template (Only for the first title)
+
+Note: The following is the evaluation metric for the first Topic, mainly. Some points won’t apply for the 2nd hackathon topic
+
+
+
+
+Criteria
+Description
+Points
+1. Functionality
+Does the blog app work as expected? Are all core features implemented and bug-free?
+25
+2. Ease of Integration
+How easily can the solution be plugged into an existing project (e.g., via npm install, API, or other methods)?
+20
+3. Code Quality & Structure
+Is the codebase clean, modular, well-documented, and maintainable? Does the README clearly explain setup and usage?
+20
+4. Creativity & Problem Solving
+Does the solution creatively solve the integration and time bottlenecks? Are there any standout features or optimizations?
+15
+5. UI/UX & Developer Experience
+Is the admin interface (if provided) user-friendly? Does the developer experience feel smooth and intuitive?
+10
+6. Presentation & Submission
+Is the project well-presented, with proper README, deployment/integration demo, and GitHub repo correctly transferred?
+10
+
+
+
