@@ -1,6 +1,7 @@
+
 "use client";
 
-import React, { createContext, useContext, useState, ReactNode } from "react";
+import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 
 export interface BlogPost {
   id: number;
@@ -42,10 +43,13 @@ interface BlogContextType {
   setShowOnlyPublished: (show: boolean) => void;
   handleAdminLogin: () => void;
   handleAdminLogout: () => void;
-  handleSavePost: (post: BlogPost) => void;
-  handleDeletePost: (id: number) => void;
-  togglePostVisibility: (id: number) => void;
+  handleSavePost: (post: BlogPost) => Promise<void>;
+  handleDeletePost: (id: number) => Promise<void>;
+  togglePostVisibility: (id: number) => Promise<void>;
   filteredPosts: BlogPost[];
+  loading: boolean;
+  refreshPosts: () => Promise<void>;
+  refreshSettings: () => Promise<void>;
 }
 
 const BlogContext = createContext<BlogContextType | undefined>(undefined);
@@ -63,49 +67,13 @@ interface BlogProviderProps {
 }
 
 export const BlogProvider: React.FC<BlogProviderProps> = ({ children }) => {
-  const [posts, setPosts] = useState<BlogPost[]>([
-    {
-      id: 1,
-      title: "How Gaming Builds Resilience and Discipline",
-      excerpt: "Explore how games teach valuable life skills like resilience and continuous growth.",
-      content: "Gaming has evolved far beyond entertainment. Modern games challenge players to develop critical thinking, strategic planning, and emotional resilience. Through repeated failures and successes, gamers learn to adapt, persevere, and continuously improve their skills.",
-      image: "/assets/images/events/mobile_legend_championship.webp", // Local image
-      date: "2024-01-15",
-      author: "EGA Team",
-      published: true,
-    },
-    {
-      id: 2,
-      title: "Connecting Communities Through Games",
-      excerpt: "Discover how gaming brings people together to create culture and economy.",
-      content: "Games serve as a universal language that transcends geographical and cultural boundaries. They create shared experiences, foster teamwork, and build lasting friendships. The gaming community in Ethiopia is growing rapidly, connecting young minds and creating opportunities.",
-      image: "/assets/images/events/mobile_legend_championship.webp", // Local image
-      date: "2024-01-10",
-      author: "EGA Team",
-      published: true,
-    },
-    {
-      id: 3,
-      title: "The Role of Gamification in Modern Development",
-      excerpt: "Understand the impact of gamification companies and studios on the industry.",
-      content: "Gamification is revolutionizing how we approach education, business, and personal development. By incorporating game mechanics into non-game contexts, we can increase engagement, motivation, and learning outcomes.",
-      image: "/assets/images/events/mobile_legend_championship.webp", // Local image
-      date: "2024-01-05",
-      author: "EGA Team",
-      published: false,
-    },
-  ]);
-
+  const [posts, setPosts] = useState<BlogPost[]>([]);
   const [siteSettings, setSiteSettings] = useState<SiteSettings>({
     title: "Ethiopian Games Association Blog",
-    subtitle:
-      "Sharing stories, insights, and updates about games, gamification, and the community.",
-    mission:
-      "Games and play are a language that the world can speak; through games you can create, connect and cultivate economy, culture, and values.",
-    quote:
-      "Games teach resilience, discipline, and continuous growth — elevating us to become better humans through determination and excellence.",
-    heroImage:
-      "https://images.pexels.com/photos/194511/pexels-photo-194511.jpeg?auto=compress&cs=tinysrgb&w=1600",
+    subtitle: "Sharing stories, insights, and updates about games, gamification, and the community.",
+    mission: "Games and play are a language that the world can speak; through games you can create, connect and cultivate economy, culture, and values.",
+    quote: "Games teach resilience, discipline, and continuous growth — elevating us to become better humans through determination and excellence.",
+    heroImage: "https://images.pexels.com/photos/194511/pexels-photo-194511.jpeg?auto=compress&cs=tinysrgb&w=1600",
   });
 
   const [search, setSearch] = useState("");
@@ -115,8 +83,50 @@ export const BlogProvider: React.FC<BlogProviderProps> = ({ children }) => {
   const [editingPost, setEditingPost] = useState<BlogPost | null>(null);
   const [editingSettings, setEditingSettings] = useState(false);
   const [showOnlyPublished, setShowOnlyPublished] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const adminPass = "admin123"; // In production, this should be properly secured
+
+  // Load posts from API
+  const refreshPosts = async () => {
+    try {
+      setLoading(true);
+      const published = showOnlyPublished ? 'true' : 'false';
+      const searchParam = search ? `&search=${encodeURIComponent(search)}` : '';
+      
+      const response = await fetch(`/api/blog/posts?published=${published}${searchParam}`);
+      if (response.ok) {
+        const data = await response.json();
+        setPosts(data);
+      }
+    } catch (error) {
+      console.error('Error fetching posts:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Load settings from API
+  const refreshSettings = async () => {
+    try {
+      const response = await fetch('/api/blog/settings');
+      if (response.ok) {
+        const data = await response.json();
+        setSiteSettings(data);
+      }
+    } catch (error) {
+      console.error('Error fetching settings:', error);
+    }
+  };
+
+  // Load data on mount and when dependencies change
+  useEffect(() => {
+    refreshPosts();
+  }, [showOnlyPublished, search]);
+
+  useEffect(() => {
+    refreshSettings();
+  }, []);
 
   const handleAdminLogin = () => {
     if (adminPassword === adminPass) {
@@ -144,35 +154,142 @@ export const BlogProvider: React.FC<BlogProviderProps> = ({ children }) => {
     return matchesSearch && matchesVisibility;
   });
 
-  const handleSavePost = (post: BlogPost) => {
-    if (post.id === 0) {
-      // New post
-      const newPost = { ...post, id: Math.max(...posts.map((p) => p.id)) + 1 };
-      setPosts([newPost, ...posts]);
-    } else {
-      // Update existing post
-      setPosts(posts.map((p) => (p.id === post.id ? post : p)));
+  const handleSavePost = async (post: BlogPost) => {
+    try {
+      setLoading(true);
+      
+      if (post.id === 0) {
+        // New post
+        const response = await fetch('/api/blog/posts', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(post),
+        });
+
+        if (response.ok) {
+          await refreshPosts();
+        } else {
+          const error = await response.json();
+          alert(`Error creating post: ${error.error}`);
+          return;
+        }
+      } else {
+        // Update existing post
+        const response = await fetch(`/api/blog/posts/${post.id}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(post),
+        });
+
+        if (response.ok) {
+          await refreshPosts();
+        } else {
+          const error = await response.json();
+          alert(`Error updating post: ${error.error}`);
+          return;
+        }
+      }
+      
+      setEditingPost(null);
+    } catch (error) {
+      console.error('Error saving post:', error);
+      alert('Error saving post');
+    } finally {
+      setLoading(false);
     }
-    setEditingPost(null);
   };
 
-  const handleDeletePost = (id: number) => {
-    if (confirm("Are you sure you want to delete this post?")) {
-      setPosts(posts.filter((p) => p.id !== id));
+  const handleDeletePost = async (id: number) => {
+    if (!confirm("Are you sure you want to delete this post?")) return;
+
+    try {
+      setLoading(true);
+      
+      const response = await fetch(`/api/blog/posts/${id}`, {
+        method: 'DELETE',
+      });
+
+      if (response.ok) {
+        await refreshPosts();
+      } else {
+        const error = await response.json();
+        alert(`Error deleting post: ${error.error}`);
+      }
+    } catch (error) {
+      console.error('Error deleting post:', error);
+      alert('Error deleting post');
+    } finally {
+      setLoading(false);
     }
   };
 
-  const togglePostVisibility = (id: number) => {
-    setPosts(
-      posts.map((p) => (p.id === id ? { ...p, published: !p.published } : p))
-    );
+  const togglePostVisibility = async (id: number) => {
+    try {
+      setLoading(true);
+      const post = posts.find(p => p.id === id);
+      if (!post) return;
+
+      const updatedPost = { ...post, published: !post.published };
+      
+      const response = await fetch(`/api/blog/posts/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updatedPost),
+      });
+
+      if (response.ok) {
+        await refreshPosts();
+      } else {
+        const error = await response.json();
+        alert(`Error updating post visibility: ${error.error}`);
+      }
+    } catch (error) {
+      console.error('Error toggling post visibility:', error);
+      alert('Error updating post visibility');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSaveSettings = async (settings: SiteSettings) => {
+    try {
+      setLoading(true);
+      
+      const response = await fetch('/api/blog/settings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(settings),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setSiteSettings(data);
+        setEditingSettings(false);
+      } else {
+        const error = await response.json();
+        alert(`Error saving settings: ${error.error}`);
+      }
+    } catch (error) {
+      console.error('Error saving settings:', error);
+      alert('Error saving settings');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const value: BlogContextType = {
     posts,
     setPosts,
     siteSettings,
-    setSiteSettings,
+    setSiteSettings: handleSaveSettings,
     search,
     setSearch,
     isAdmin,
@@ -193,7 +310,10 @@ export const BlogProvider: React.FC<BlogProviderProps> = ({ children }) => {
     handleDeletePost,
     togglePostVisibility,
     filteredPosts,
+    loading,
+    refreshPosts,
+    refreshSettings,
   };
 
   return <BlogContext.Provider value={value}>{children}</BlogContext.Provider>;
-}; 
+};
